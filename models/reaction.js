@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { mongoose, Schema, model, Types } = require("mongoose");
 
 const reactionSchema = new mongoose.Schema(
 	{

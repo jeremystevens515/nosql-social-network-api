@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { mongoose, Schema, model, Types } = require("mongoose");
 const reactionSchema = require("./Reaction");
 
 const thoughtSchema = new mongoose.Schema(
@@ -14,9 +14,9 @@ const thoughtSchema = new mongoose.Schema(
 			default: Date.now(), // provides a unix timestamp
 		},
 		reactions: {
-			type: Array,
-			ref: "reaction",
-		}, // array of reaction documents
+			type: Schema.Types.ObjectId,
+			ref: "Reaction",
+		},
 	},
 	{
 		toJSON: {

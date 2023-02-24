@@ -11,13 +11,9 @@ const createNewUser = (req, res) => {
 };
 
 const getAllUsers = (req, res) => {
-	User.find()
+	User.find({})
 		.then((users) => {
-			if (!users) {
-				res.status(404).json({ message: "No users found" });
-			} else {
-				res.status(200).json(users);
-			}
+			res.json(users);
 		})
 		.catch((err) => res.status(500).json(err));
 };
