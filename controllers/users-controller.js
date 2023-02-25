@@ -52,11 +52,17 @@ const updateUser = (req, res) => {
 };
 
 const deleteUser = (req, res) => {
+	// having problems getting users' friends lists to update
 	User.findOneAndRemove({ _id: req.params.userId })
 		.then((user) => {
 			if (!user) {
 				res.status(404).json({ message: "No user found" });
 			} else {
+				User.updateMany(
+					{ friends: req.params.userId },
+					{ $pull: { friends: req.params.userId } },
+					{ new: true }
+				);
 				Thought.deleteMany({ _id: { $in: user.thoughts } });
 			}
 		})
@@ -72,7 +78,7 @@ const addNewFriend = (req, res) => {
 	User.findOneAndUpdate(
 		{ _id: req.params.userId },
 		{ $addToSet: { friends: req.params.friendId } },
-		{ runValidators: true, new: true }
+		{ new: true }
 	)
 		.then((user) => {
 			if (!user) {
@@ -87,8 +93,8 @@ const addNewFriend = (req, res) => {
 const deleteFriend = (req, res) => {
 	User.findOneAndUpdate(
 		{ _id: req.params.userId },
-		{ $pull: { friends: { _id: req.params.friendId } } },
-		{ runValidators: true, new: true }
+		{ $pull: { friends: req.params.friendId } },
+		{ new: true }
 	)
 		.then((user) => {
 			if (!user) {

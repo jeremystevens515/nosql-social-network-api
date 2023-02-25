@@ -13,10 +13,12 @@ const thoughtSchema = new mongoose.Schema(
 			type: Date,
 			default: Date.now(), // provides a unix timestamp
 		},
-		reactions: {
-			type: Schema.Types.ObjectId,
-			ref: "Reaction",
-		},
+		reactions: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Reaction",
+			},
+		],
 	},
 	{
 		toJSON: {

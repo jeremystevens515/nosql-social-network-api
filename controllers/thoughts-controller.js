@@ -26,21 +26,21 @@ const getThoughtById = (req, res) => {
 };
 
 const createNewThought = (req, res) => {
-	Thought.create({ thoughtText: req.body.thoughtText }, { new: true })
+	Thought.create({ thoughtText: req.body.thoughtText })
 		.then((thought) => {
 			User.findOneAndUpdate(
 				{ _id: req.body.userId },
-				{ $addToSet: { thoughts: thought } },
+				{ $addToSet: { thoughts: thought._id } },
 				{ runValidators: true, new: true },
-				(err, results) => (err ? res.json(err) : res.json(results))
+				(err, results) =>
+					err ? console.error(err) : console.log("thougt added to user")
 			);
+			res.status(200).json(thought);
 		})
-		.then(() =>
-			res
-				.status(200)
-				.json({ message: "Thought created and added to user model" })
-		)
-		.catch((err) => res.status(500).json(err));
+		.catch((err) => {
+			console.error(err);
+			res.status(500).json(err);
+		});
 };
 
 const updateThoughtById = (req, res) => {
@@ -66,9 +66,10 @@ const deleteThought = (req, res) => {
 				res.status(404).json({ message: "No thought with that ID found" });
 			} else {
 				User.findOneAndUpdate(
-					{ _id: req.body },
+					{ _id: req.body.userId },
 					{ $pull: { thoughts: req.params.thoughtId } },
-					{ new: true }
+					{ new: true },
+					(err, results) => console.error(err)
 				);
 				res.status(200).json({ message: "Thought deleted and user updated" });
 			}
