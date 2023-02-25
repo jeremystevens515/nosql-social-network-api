@@ -24,7 +24,7 @@ const reactionSchema = new mongoose.Schema(
 		toJSON: {
 			virtuals: true,
 		},
-		id: false,
+		_id: false,
 	}
 );
 

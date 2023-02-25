@@ -26,14 +26,15 @@ const getThoughtById = (req, res) => {
 };
 
 const createNewThought = (req, res) => {
-	Thought.create({ thoughtText: req.body.thoughtText })
+	Thought.create(req.body)
 		.then((thought) => {
+			//this works without return statement because CB function was passed
 			User.findOneAndUpdate(
-				{ _id: req.body.userId },
+				{ username: req.body.username },
 				{ $addToSet: { thoughts: thought._id } },
 				{ runValidators: true, new: true },
 				(err, results) =>
-					err ? console.error(err) : console.log("thougt added to user")
+					err ? console.error(err) : console.log("thought added to user")
 			);
 			res.status(200).json(thought);
 		})
@@ -60,24 +61,39 @@ const updateThoughtById = (req, res) => {
 };
 
 const deleteThought = (req, res) => {
-	Thought.findOneAndRemove({ _id: req.params.thoughtId })
+	Thought.findOneAndDelete({ _id: req.params.thoughtId })
 		.then((thought) => {
+			// console.log("delete thought:", thought);
 			if (!thought) {
 				res.status(404).json({ message: "No thought with that ID found" });
 			} else {
-				User.findOneAndUpdate(
-					{ _id: req.body.userId },
+				return User.findOneAndUpdate(
+					{ username: thought.username },
 					{ $pull: { thoughts: req.params.thoughtId } },
-					{ new: true },
-					(err, results) => console.error(err)
+					{ new: true }
 				);
-				res.status(200).json({ message: "Thought deleted and user updated" });
 			}
+		})
+		.then((updateThought) => {
+			// console.log("user thoughts update:", updateThought);
+			res.status(200).json({ message: "Thought deleted and user updated" });
 		})
 		.catch((err) => res.status(500).json(err));
 };
 
-const createReaction = (req, res) => {};
+const createReaction = (req, res) => {
+	Thought.findOneAndUpdate(
+		{ _id: req.params.thoughtId },
+		{ $addToSet: { reactions: req.body } },
+		{ runValidators: true, new: true }
+	)
+		.then((thought) =>
+			!thought
+				? res.status(404).json({ message: "No thought with that Id" })
+				: res.status(200).json(thought)
+		)
+		.catch((err) => res.status(500).json(err));
+};
 
 const deleteReaction = (req, res) => {};
 

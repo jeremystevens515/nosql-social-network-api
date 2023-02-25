@@ -9,16 +9,15 @@ const thoughtSchema = new mongoose.Schema(
 			minLength: 1,
 			maxLength: 280,
 		},
+		username: {
+			type: String,
+			required: true,
+		},
 		createdAt: {
 			type: Date,
 			default: Date.now(), // provides a unix timestamp
 		},
-		reactions: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: "Reaction",
-			},
-		],
+		reactions: [reactionSchema],
 	},
 	{
 		toJSON: {

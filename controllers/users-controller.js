@@ -52,25 +52,30 @@ const updateUser = (req, res) => {
 };
 
 const deleteUser = (req, res) => {
-	// having problems getting users' friends lists to update
-	User.findOneAndRemove({ _id: req.params.userId })
+	User.findOneAndDelete({ _id: req.params.userId })
 		.then((user) => {
+			// console.log("userDelete:", user);
 			if (!user) {
-				res.status(404).json({ message: "No user found" });
+				res.status(404).json({ message: "No user with this ID" });
 			} else {
-				User.updateMany(
-					{ friends: req.params.userId },
-					{ $pull: { friends: req.params.userId } },
-					{ new: true }
-				);
-				Thought.deleteMany({ _id: { $in: user.thoughts } });
+				return Thought.deleteMany({ _id: { $in: user.thoughts } });
 			}
 		})
-		.then(() =>
-			res
-				.status(200)
-				.json({ message: "User and associated thoughts successfully deleted" })
-		)
+		.then((thoughtDelete) => {
+			// console.log("thoughtDelete:", thoughtDelete);
+			return User.updateMany(
+				{ friends: req.params.userId },
+				{ $pull: { friends: req.params.userId } },
+				{ new: true }
+			);
+		})
+		.then((update) => {
+			// console.log("update friends lists: ", update);
+			res.status(200).json({
+				message:
+					"User and associated thoughts successfully deleted. User removed from other users' friends lists.",
+			});
+		})
 		.catch((err) => res.status(500).json(err));
 };
 
