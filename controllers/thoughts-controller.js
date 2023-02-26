@@ -34,7 +34,7 @@ const createNewThought = (req, res) => {
 				{ $addToSet: { thoughts: thought._id } },
 				{ runValidators: true, new: true },
 				(err, results) =>
-					err ? console.error(err) : console.log("thought added to user")
+					err ? console.error(err) : console.log("Thought added to user.")
 			);
 			res.status(200).json(thought);
 		})
@@ -96,9 +96,17 @@ const createReaction = (req, res) => {
 };
 
 const deleteReaction = (req, res) => {
-	Reaction.findOneAndDelete({reactionId: req.params.reactionId})
-	.then((reaction)=> !reaction ? res.status(404).json({message: "No reaction by that ID found}) : res.status(200).json(reaction))
-	.catch((err)=> res.status(500).json(err))
+	Thought.findOneAndUpdate(
+		{ _id: req.params.thoughtId },
+		{ $pull: { reactions: req.body } },
+		{ runValidators: true, new: true }
+	)
+		.then((thought) =>
+			!thought
+				? res.status(404).json({ message: "No thought with that Id" })
+				: res.status(200).json(thought)
+		)
+		.catch((err) => res.status(500).json(err));
 };
 
 module.exports = {

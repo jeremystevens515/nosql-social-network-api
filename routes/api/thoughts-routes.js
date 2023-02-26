@@ -22,10 +22,7 @@ router
 // /api/thoughts/:thoughtId/reactions
 router
 	.route("/:thoughtId/reactions")
-	.post(createReaction);
-	
-// /api/thoughts/reactions/:reactionId
-router
-	.route("/reactions/:reactionId")
-	.delete(deleteReaction)
+	.post(createReaction)
+	.delete(deleteReaction);
+
 module.exports = router;
