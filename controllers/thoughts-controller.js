@@ -95,7 +95,11 @@ const createReaction = (req, res) => {
 		.catch((err) => res.status(500).json(err));
 };
 
-const deleteReaction = (req, res) => {};
+const deleteReaction = (req, res) => {
+	Reaction.findOneAndDelete({reactionId: req.params.reactionId})
+	.then((reaction)=> !reaction ? res.status(404).json({message: "No reaction by that ID found}) : res.status(200).json(reaction))
+	.catch((err)=> res.status(500).json(err))
+};
 
 module.exports = {
 	getAllThoughts,
